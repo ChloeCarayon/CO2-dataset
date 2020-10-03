@@ -1,0 +1,141 @@
+---
+title: 'Project: CO2, Carbon Dioxide Uptake in Grass Plants'
+author: "Carayon - Taillieu"
+date: "02/10/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Description of the dataset
+
+The CO2 data frame is the result of an experiment based on the cold tolerance of the grass species Echinochloa crus-galli.
+We load the data and get some information about it thanks to this commands:
+
+```{r basics}
+data("CO2")
+dim(CO2)
+names(CO2)
+```
+
+The CO2 dataset is composed of 84 rows ans 5 columns of names
+"Plant"     "Type"      "Treatment"  "conc"      "uptake" 
+Using the help section, we learn that 
+- Plant gives to each plant an unique identifier:
+    Q and M represent respectively Quebec and Mississippi.
+    then adding n or c, we get information about the treatment.
+    And finally, the number 1, 2 or 3 is the id of the plant.
+    For example, Mc1 will be the plant 1 from Mississippi which was chilled.
+- Type shows the origin of the plant.
+    Mississippi or Quebec.
+- Treatment is a factor with a level of chilled or nonchilled.
+- Conc will represent the ambient carbon dioxide concentrations' vector, it will be in (mL/L).
+- Uptake is the carbon dioxide uptake rates' vector in  (umol/m^2 sec).
+
+The CO2 uptake of six plants from Quebec and six plants from Mississippi was measured at several levels of ambient CO2 concentration. Half the plants of each type were chilled overnight before the experiment was conducted.
+
+## Data exploration
+
+### Summary
+Let's see the dataset and its structure:
+
+```{r structure}
+CO2
+class(CO2) # explain what it is?
+str(CO2)
+```
+
+The output confirms what we have seen before thanks to the functions and help section.
+
+/!\ trouver attr ce que ça signifie et expliquer 
+
+```{r summary}
+summary(CO2)
+levels(CO2 $Plant)
+```
+
+Thanks to the summary, we obtain the different information depending on the column names, we  do the levels function to the plant as we don't have all the information displayed in the summary. 
+We deduce that we put 12 plants in several conditions (with their name corresponding to the treatment and type and number) and measures the concentration of ambient carbon dioxide and the carbon dioxide uptake rates. 
+We can see that the concentration of carbon dioxide as the  carbon dioxide uptake rates for all plants 
+
+```{r tapply}
+tapply(CO2 $uptake, CO2 $Plant, summary)
+```
+
+Let's take the examples of Qn3 and Mn3 for the uptake :
+
+For plants Qn3 (thrid plant species of quebec nonchilled):
+All the Qn3 have an uptake rate between 16.20 and 45.5 with an average of 37.61. 
+Half of the Qn3 have a rate less than 42.1. 
+In those plants, 25% have an uptake rate less than 36.35. 
+Moreover, 75% have a rate less than 43.40.
+In fact 50% of the population uptake rate is between 36.35 and 43.40 (mL/L).
+
+For plants Mn3 (thrid plant species of Mississippi nonchilled):
+All the Mn3 have an uptake rate between 11.3 and 28.5 with an average of 24.11. 
+Half of the Mn3 have a rate less than 27.8. 
+In those plants, 25% have an uptake rate less than 22.60. 
+Moreover, 75% have a rate less than 28.
+In fact 50% of the population uptake rate is between 22.60 and 28 (mL/L).
+
+So we see that for two plants of type 3 which have been nonchilled but which come from different countries, we have huge differences of uptake rate. We can also see that depending of the treatment, the result will be quite different.
+We can study it more preciselly using summarize function from the dplyr library.
+
+```{r summarize}
+library(dplyr)
+summarize(group_by(CO2, Type), average_uptake = mean(uptake))
+summarize(group_by(CO2, Treatment), average_uptake = mean(uptake))
+summarize(group_by(CO2, conc), average_uptake = mean(uptake))
+```
+
+From these results, we can observe that the average uptake for plants from Quebec is higher than the one for plants from Mississippi (33.5 and 20.9 umol/m^2 sec respectively).
+If we compare them according to the treatment, chilled plants have a smaller average uptake compared to nonchilled ones (23.8 as opposed to 30.6 umol/m^2 sec).
+Finally, it makes sense to see that when we increase the concentration of ambient carbon dioxide, the plants tend to have better carbon dioxide uptake rates.
+
+## Data visualization
+
+### boxplot uptake fonction country
+
+Let's compare the uptake rate depending on the type of plants 
+```{r}
+boxplot(uptake ~ Type, data = CO2,
+        boxwex = 0.5, col = c("orange", "yellow"),
+        main = "Uptake plant depending on country",
+        xlab = "country",
+        ylab = "uptake")
+        
+library(ggplot2)
+p<-ggplot(CO2, aes(x=Plant, y=uptake, fill=Treatment, color=Type)) +
+  geom_boxplot()
+p+scale_color_brewer(palette="Dark2")
+
+p<-ggplot(CO2, aes(x=Treatment, y=uptake, fill=Plant)) +
+  geom_boxplot()
+p
+
+
+#idee 
+p<-ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill=Plant)) +
+  geom_boxplot()
+p
+
+```
+
+Thanks to those boxplot, we can clearly see that depending on the type of plants, the uptake rate will be quite different:
+The first plot show us 
+
+
+```{r}
+library(ggplot2)
+qplot(conc, uptake, facets = Treatment ~ ., data = CO2,
+      color = Type, geom = c("point", "smooth"), se = FALSE)
+qplot(uptake, data = CO2, color = Treatment, geom = "density")
+qplot(uptake, data = CO2, color = Type, geom = "density")
+```
+
+## Testing hypothesis
+
+
+
+## Fitting model
+
