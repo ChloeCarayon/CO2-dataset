@@ -56,30 +56,43 @@ levels(CO2 $Plant)
 
 Thanks to the summary, we obtain the different information depending on the column names, we  do the levels function to the plant as we don't have all the information displayed in the summary. 
 We deduce that we put 12 plants in several conditions (with their name corresponding to the treatment and type and number) and measures the concentration of ambient carbon dioxide and the carbon dioxide uptake rates. 
-We can see that the concentration of carbon dioxide as the  carbon dioxide uptake rates for all plants 
+We can see that the concentration of carbon dioxide as the  carbon dioxide uptake rates for all plants.
 
+
+By comparing the  types of plants (Quebec - Mississipi),we can see some characteristics:
+```{r tapply1}
+tapply(CO2 $uptake, CO2 $Type, summary)
+```
+Plants from Quebec have an uptake rate between 9.30 and 45.50 whereas for Mississippi, it is between 7.70 and 35.50.
+Moreover, for Quebec, half of plants have an uptake rate more than 37.15 while for Mississippi, it is less than 19.30.
+There are huge differences between Quebec and Mississippi minimums, maximums, medians and also quartiles.
+25% of Quebec plants have an uptake rate under 30.32 while for Mississipi it is 13.88.
+Finally, for 75% of Mississippi plants, the uptake rate is less than 28.05 whereas for Quebec it is less than 40.15.
+
+So it appears that Quebec plants seem to have more important uptake rate than Mississippi plants.
+
+Let's take a look on two plants from Quebec, one chilled and one non chilled:
 ```{r tapply}
 tapply(CO2 $uptake, CO2 $Plant, summary)
 ```
-
-Let's take the examples of Qn3 and Mn3 for the uptake :
-
-For plants Qn3 (thrid plant species of quebec nonchilled):
+Let's take the examples of Qn3 and Qc3 for the uptake :
+- For plants Qn3 (third plant species of Quebec nonchilled):
 All the Qn3 have an uptake rate between 16.20 and 45.5 with an average of 37.61. 
-Half of the Qn3 have a rate less than 42.1. 
+Half of the Qn3 have a rate less than 42.10. 
 In those plants, 25% have an uptake rate less than 36.35. 
 Moreover, 75% have a rate less than 43.40.
 In fact 50% of the population uptake rate is between 36.35 and 43.40 (mL/L).
 
-For plants Mn3 (thrid plant species of Mississippi nonchilled):
-All the Mn3 have an uptake rate between 11.3 and 28.5 with an average of 24.11. 
-Half of the Mn3 have a rate less than 27.8. 
-In those plants, 25% have an uptake rate less than 22.60. 
-Moreover, 75% have a rate less than 28.
-In fact 50% of the population uptake rate is between 22.60 and 28 (mL/L).
+- For plants Qc3 (third plant species of Quebec chilled):
+All the Qc3 have an uptake rate between 15.10 and 41.40 with an average of 32.59. 
+Half of the Qc3 have a rate less than 38.10. 
+In those plants, 25% have an uptake rate less than 27.50. 
+Moreover, 75% have a rate less than 39.25.
+In fact 50% of the population uptake rate is between 27.50 and 39.25 (mL/L).
 
-So we see that for two plants of type 3 which have been nonchilled but which come from different countries, we have huge differences of uptake rate. We can also see that depending of the treatment, the result will be quite different.
-We can study it more preciselly using summarize function from the dplyr library.
+So we see that for two plants of number 3 from the same origin (Quebec) but one chilled and one non chilled, we obtain huge differences of uptake rate. 
+
+We can study it in depth using summarize function from the dplyr library.
 
 ```{r summarize}
 library(dplyr)
@@ -96,33 +109,58 @@ Finally, it makes sense to see that when we increase the concentration of ambien
 
 ### boxplot uptake fonction country
 
-Let's compare the uptake rate depending on the type of plants 
+Using different plots, we will visualize our data based on what we saw before.
+
+Firstly, we can take a look on our plant types (Quebec and Mississippi) and link them with the uptake rate using boxplots:
 ```{r}
-boxplot(uptake ~ Type, data = CO2,
-        boxwex = 0.5, col = c("orange", "yellow"),
-        main = "Uptake plant depending on country",
-        xlab = "country",
-        ylab = "uptake")
-        
 library(ggplot2)
-p<-ggplot(CO2, aes(x=Plant, y=uptake, fill=Treatment, color=Type)) +
-  geom_boxplot()
-p+scale_color_brewer(palette="Dark2")
+ggplot(subset(CO2), aes(x=Type, y=uptake,  fill=Type)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of  plants depending on country") 
 
-p<-ggplot(CO2, aes(x=Treatment, y=uptake, fill=Plant)) +
-  geom_boxplot()
-p
+#boxplot(uptake ~ Type, data = CO2,boxwex = 0.5, col = c("orange", "yellow"),main = "Uptake rates of plants depending on country",xlab = "country",ylab = "uptake")
+```
+This result confirms what we saw in the data exploration part. There is a huge difference in the uptake rate depending the plant origin. As we know 50% of the data are in the box and by visualizing those boxplots, we clearly see that plants from Quebec have more chance to have  huger uptake rates than Mississippi plants. In fact 25% of Quebec plants have more than 30 for their uptake rate whereas 75% of Mississippi plants are under 30 for their uptake rates.
 
+Now, let's take a look on the importance of the treatment on those plants.
+Let's compare the uptake rate depending on the treatment of plants. 
+* For Quebec
+```{r}
+library(ggplot2)
+#ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill=Plant)) +
+ # geom_boxplot() + ggtitle("uptake rates of Quebec plants depending on treatment")
 
-#idee 
-p<-ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill=Plant)) +
-  geom_boxplot()
-p
+ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill = Treatment)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of Quebec plants depending on treatment")
+```
+In the previous part, we study two plants from Quebec with different treatments and find out that there were important differences in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
+
+* For Mississippi
+```{r}
+#ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill=Plant)) #+geom_boxplot()  +  ggtitle("uptake rates of Mississippi plants depending on #treatment")
+
+ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill= Treatment)) +geom_boxplot(show.legend = FALSE)  +  ggtitle("uptake rates of Mississippi plants depending on treatment")
+```
+Those differences are more relevant with Mississippi plants:
+Non chilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
+
+Now, if we combine our plots, we will obtain the following result:
+```{r}
+p<-ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) +
+  geom_boxplot() + ggtitle("uptake rates of plant types depending on treatment") 
+p + scale_color_brewer(palette="Set1")
 
 ```
+Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
 
-Thanks to those boxplot, we can clearly see that depending on the type of plants, the uptake rate will be quite different:
-The first plot show us 
+```{r}
+#IDEEE RAJOUTER ???
+#If we split our boxplots depending the number of the plant, we will then obtain:
+#library(ggplot2)
+#p<-ggplot(CO2, aes(x=Plant, y=uptake, fill=Treatment, color=Type)) +
+ # geom_boxplot() + ggtitle("uptake rates of plants depending on treatment") 
+#p + scale_color_brewer(palette="Set1")
+```
+
+
+### Qplot
 
 
 ```{r}
@@ -138,4 +176,5 @@ qplot(uptake, data = CO2, color = Type, geom = "density")
 
 
 ## Fitting model
+
 
