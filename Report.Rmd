@@ -118,6 +118,7 @@ ggplot(subset(CO2), aes(x=Type, y=uptake,  fill=Type)) + geom_boxplot(show.legen
 
 #boxplot(uptake ~ Type, data = CO2,boxwex = 0.5, col = c("orange", "yellow"),main = "Uptake rates of plants depending on country",xlab = "country",ylab = "uptake")
 ```
+
 This result confirms what we saw in the data exploration part. There is a huge difference in the uptake rate depending the plant origin. As we know 50% of the data are in the box and by visualizing those boxplots, we clearly see that plants from Quebec have more chance to have  huger uptake rates than Mississippi plants. In fact 25% of Quebec plants have more than 30 for their uptake rate whereas 75% of Mississippi plants are under 30 for their uptake rates.
 
 Now, let's take a look on the importance of the treatment on those plants.
@@ -130,6 +131,7 @@ library(ggplot2)
 
 ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill = Treatment)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of Quebec plants depending on treatment")
 ```
+
 In the previous part, we study two plants from Quebec with different treatments and find out that there were important differences in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
 
 * For Mississippi
@@ -138,6 +140,7 @@ In the previous part, we study two plants from Quebec with different treatments 
 
 ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill= Treatment)) +geom_boxplot(show.legend = FALSE)  +  ggtitle("uptake rates of Mississippi plants depending on treatment")
 ```
+
 Those differences are more relevant with Mississippi plants:
 Non chilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
 
@@ -148,6 +151,7 @@ p<-ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) +
 p + scale_color_brewer(palette="Set1")
 
 ```
+
 Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
 
 ```{r}
