@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # Output
 Report.html
+
+# Thumbnails macOS
+._*
