@@ -215,7 +215,7 @@ Our alternative hypothesis is that type of plants may affect the uptake rates.
 ```{r}
 t.test(CO2$uptake~CO2$Type)
 ```
-Looking on p-value for type, which is 3.835e-9, we see that it is smaller that 0.05.
+Looking on p-value for type, which is 4.451e-9, we see that it is smaller that 0.05.
 So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates.
 
 ### Combined our hypothesis
@@ -228,8 +228,7 @@ By combining our hypothesis:
 tb <- table(CO2$Type, CO2$Treatment)
 chisq.test(tb)
 ```
-We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
-But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
+
 
 ## Fitting model
 
@@ -246,3 +245,5 @@ Treatm_Type_fit = lm(CO2$uptake ~ CO2$Type*CO2$Treatment)
 anova(Treatm_Type_fit)
 
 ```
+We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
+But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
