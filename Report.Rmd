@@ -1,14 +1,14 @@
 ---
 title: 'Project: CO2, Carbon Dioxide Uptake in Grass Plants'
-author: "Carayon - Taillieu"
-date: "02/10/2020"
+author: "Carayon Chloé - Taillieu Victor"
+date: "05/11/2020"
 output:
   html_document: default
   pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
 ## Description of the dataset
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 The CO2 data frame is the result of an experiment based on the cold tolerance of the grass species Echinochloa crus-galli.
 We load the data and get some information about it thanks to this commands:
 
-```{r basics}
+```{r description}
 data(CO2)
 dim(CO2)
 names(CO2)
@@ -26,19 +26,19 @@ The CO2 dataset is composed of 84 rows ans 5 columns of names
 "Plant", "Type", "Treatment", "conc" and "uptake".
 Using the help section, we learn that:
 
-* Plant gives to each plant an unique identifier:
-  * Q and M represent respectively Quebec and Mississippi
-  * n or c, gives information about the treatment
+* Plant is a factor giving to each plant a unique identifier:
+  * Q or M represents the origin of the plant, respectively Quebec or Mississippi
+  * n or c gives information about the treatment
   * 1, 2 or 3 is the id of the plant
 
 For example, Mc1 is plant 1 from Mississippi and was chilled.
 
-* Type shows the origin of the plant (Mississippi or Quebec)
-* Treatment is a factor with a level of chilled or nonchilled
-* Conc will represent the ambient carbon dioxide concentrations' vector, it is measured in mL/L
-* Uptake is the carbon dioxide uptake rates' vector in umol/m^2 sec
+* Type is a factor with levels Quebec and Mississippi
+* Treatment is a factor with levels chilled and nonchilled
+* conc is the ambient carbon dioxide concentrations' vector, measured in mL/L
+* uptake is the carbon dioxide uptake rates' vector in umol/m² sec
 
-The CO2 uptake of plants from Quebec and Mississippi was measured at several levels of ambient CO2 concentration. 
+The CO2 uptake rate of six plants from Quebec and six plants from Mississippi was measured at several levels of ambient CO2 concentration. 
 Half the plants were chilled overnight before the experiment was conducted.
 
 ## Data exploration
@@ -49,36 +49,36 @@ Let's display the dataset and its structure:
 
 ```{r structure}
 CO2
-class(CO2) # explain what it is?
+class(CO2)
 str(CO2)
 ```
 
 The output confirms what we have seen before thanks to the functions and help section.
 
-/!\ trouver attr ce que ça signifie et expliquer 
+This dataset was originally part of another package (nlme) which has its own grouped-data classes.
+That is why there are some unusual classes like nfnGroupedData, nfGroupedData, groupedData and attr.
 
 ```{r summary}
 summary(CO2)
 levels(CO2$Plant)
 ```
 
-Thanks to the summary, we obtain information depending on the column names, we do the levels function to the plant as we don't have all the information displayed in the summary. 
-We deduce that we put 3 plants in several conditions (with their name corresponding to the treatment and type and number) and measures the concentration of ambient carbon dioxide and the carbon dioxide uptake rates. 
-We can see that the concentration of carbon dioxide as the carbon dioxide uptake rates for all plants.
+Thanks to the summary, we obtain information about each column. We execute the levels function on CO2$Plant as we don't have all the information displayed in the summary. 
+We see that 3 plants were put in several conditions (with their name corresponding to the type, treatment and number) and measurements were made on their carbon dioxide uptake rates according to the concentration of ambient carbon dioxide.
 
-By comparing the types of plants (Quebec - Mississipi), we can see some characteristics:
+By grouping plants by their type (Quebec - Mississipi), we can see some characteristics:
 
 ```{r tapply1}
 tapply(CO2$uptake, CO2$Type, summary)
 ```
 
 Plants from Quebec have an uptake rate between 9.30 and 45.50 whereas for Mississippi, it is between 7.70 and 35.50.
-Moreover, for Quebec, half of plants have an uptake rate more than 37.15 while for Mississippi, it is less than 19.30.
+Moreover, for Quebec, half of plants have an uptake rate greater than 37.15 while for Mississippi, it is 19.30.
 There are huge differences between Quebec and Mississippi minimums, maximums, medians and also quartiles.
-25% of Quebec plants have an uptake rate under 30.32 while for Mississipi it is 13.88.
+A quarter of Quebec plants have an uptake rate under 30.32 while for Mississipi it is 13.88.
 Finally, for 75% of Mississippi plants, the uptake rate is less than 28.05 whereas for Quebec it is less than 40.15.
 
-So it appears that Quebec plants seem to have more important uptake rate than Mississippi plants.
+So it appears that Quebec plants seem to have higher uptake rates than Mississippi plants.
 
 Let's take a look on two plants from Quebec, one chilled and one non chilled:
 
@@ -86,24 +86,25 @@ Let's take a look on two plants from Quebec, one chilled and one non chilled:
 tapply(CO2$uptake, CO2$Plant, summary)
 ```
 
-Let's take the examples of Qn3 and Qc3 for the uptake:
-- For plants Qn3 (third plant species of Quebec nonchilled):
-All the Qn3 have an uptake rate between 16.20 and 45.5 with an average of 37.61.
+Let's take the examples of Qn3 and Qc3:
+
+- Qn3 (third plant species of Quebec nonchilled)
+have an uptake rate between 16.20 and 45.50 with an average of 37.61.
 Half of the Qn3 have a rate less than 42.10.
 In those plants, 25% have an uptake rate less than 36.35.
 Moreover, 75% have a rate less than 43.40.
 In fact 50% of the population uptake rate is between 36.35 and 43.40 (mL/L).
 
-- For plants Qc3 (third plant species of Quebec chilled):
-All the Qc3 have an uptake rate between 15.10 and 41.40 with an average of 32.59.
+- Qc3 (third plant species of Quebec chilled):
+have an uptake rate between 15.10 and 41.40 with an average of 32.59.
 Half of the Qc3 have a rate less than 38.10.
 In those plants, 25% have an uptake rate less than 27.50.
 Moreover, 75% have a rate less than 39.25.
 In fact 50% of the population uptake rate is between 27.50 and 39.25 (mL/L).
 
-So we see that for two plants of number 3 from the same origin (Quebec) but one chilled and one non chilled, we obtain huge differences of uptake rate.
+So we see that for two plants numbered 3 from the same origin (Quebec) but one chilled and one non chilled, we obtain a significant difference in uptake rate.
 
-We can study it in depth using summarize function from the dplyr library.
+We can sum up these differences using the summarize function from dplyr library.
 
 ```{r summarize}
 library(dplyr)
@@ -112,78 +113,106 @@ summarize(group_by(CO2, Treatment), average_uptake = mean(uptake))
 summarize(group_by(CO2, conc), average_uptake = mean(uptake))
 ```
 
-From these results, we can observe that the average uptake for plants from Quebec is higher than the one for plants from Mississippi (33.5 and 20.9 umol/m^2 sec respectively).
-If we compare them according to the treatment, chilled plants have a smaller average uptake compared to nonchilled ones (23.8 as opposed to 30.6 umol/m^2 sec).
-Finally, it makes sense to see that when we increase the concentration of ambient carbon dioxide, the plants tend to have better carbon dioxide uptake rates.
+From these results, we observe that the average uptake for plants from Quebec is much higher than the one for plants from Mississippi (33.5 and 20.9 umol/m² sec respectively).
+If we compare them according to the treatment, chilled plants have a smaller average uptake compared to nonchilled ones (23.8 as opposed to 30.6 umol/m² sec).
+Finally, it makes sense to see that when we increase the concentration of ambient carbon dioxide, the plants tend to have higher carbon dioxide uptake rates.
 
 ## Data visualization
 
-### boxplot uptake fonction country
+### Global overview
 
-Using different plots, we will visualize our data based on what we saw before.
+To begin with, let's just plot the data without any filtering:
 
-Firstly, we can take a look on our plant types (Quebec and Mississippi) and link them with the uptake rate using boxplots:
 ```{r}
 library(ggplot2)
-ggplot(subset(CO2), aes(x=Type, y=uptake,  fill=Type)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of  plants depending on country") 
-
-#boxplot(uptake ~ Type, data = CO2,boxwex = 0.5, col = c("orange", "yellow"),main = "Uptake rates of plants depending on country",xlab = "country",ylab = "uptake")
+qplot(conc, uptake, data = CO2, geom = "point",
+      main = "CO2 uptake rate according to ambient CO2 concentration",
+      xlab = "CO2 concentration (mL/L)", ylab = "CO2 uptake rate (umol/m² sec)")
 ```
 
-This result confirms what we saw in the data exploration part. There is a huge difference in the uptake rate depending the plant origin. As we know 50% of the data are in the box and by visualizing those boxplots, we clearly see that plants from Quebec have more chance to have  huger uptake rates than Mississippi plants. In fact 25% of Quebec plants have more than 30 for their uptake rate whereas 75% of Mississippi plants are under 30 for their uptake rates.
+The only thing we can say is that CO2 uptake rates seem to increase as ambient CO2 concentration increase.
 
-Now, let's take a look on the importance of the treatment on those plants.
-Let's compare the uptake rate depending on the treatment of plants. 
+Then, we can separate plants by their characteristics to get some insights:
+
+```{r}
+qplot(conc, uptake, facets = Treatment ~ ., data = CO2, color = Type,
+      geom = c("point", "smooth"), se = FALSE,
+      main = "CO2 uptake according to ambient CO2 concentration",
+      xlab = "CO2 concentration (mL/L)", ylab = "CO2 uptake rate (umol/m² sec)")
+```
+
+Here we can observe several interesting things:
+
+- As we noticed in the previous part, plants from Quebec (in red) almost always have a higher CO2 uptake rate compared to plants from Mississippi for the same ambient concentration. The smooth tendency lines clearly show that.
+- Moreover, nonchilled plants (in the upper graph) seem to jump higher in terms of uptake rates that chilled ones.
+
+We can say that this visualization confirms what we pointed out in the data exploration part.
+Now, let's go further by analyzing the distribution of uptake rates according to the country of origin or treatment.
+
+```{r}
+qplot(uptake, data = CO2, color = Type, geom = "density",
+      main = "Plants CO2 uptake distribution according to their origin",
+      xlab = "CO2 uptake rate (umol/m² sec)")
+qplot(uptake, data = CO2, color = Treatment, geom = "density",
+      main = "Plants CO2 uptake distribution according to their treatment",
+      xlab = "CO2 uptake rate (umol/m² sec)")
+```
+
+Again, these two plots confirm our hypothesis made above.
+An important part of Mississippi plants have an uptake rate between 15 and 20 umol/m² sec whereas for Quebec plants the peak is at about 40 umol/m² sec.
+For the treatment, a big part of chilled plants have an uptake rate between 15 and 20 umol/m² sec whereas for nonchilled plants the peak is higher, at about 30 umol/m² sec.
+
+### Boxplot of uptake by origin
+
+Now, we are going to use boxplots to visualize the spreading of the uptake rates.
+We can group our plants by types (Quebec and Mississippi):
+
+```{r}
+ggplot(CO2, aes(x=Type, y=uptake,  fill=Type)) +
+  geom_boxplot(show.legend = FALSE) +
+  ggtitle("Plants CO2 uptake rates depending on their origin") +
+  xlab("Origin") + ylab("CO2 uptake rate (umol/m² sec)")
+```
+
+This figure confirms what we saw in the data exploration part. There is a huge difference in the uptake rates between plants from Quebec and plants from Mississippi. As we know 50% of the data is in the box and by visualizing those boxplots, we clearly see that on average, plants from Quebec have higher uptake rates than Mississippi plants. In fact 25% of Quebec plants have less than 30 for their uptake rate whereas more than 75% of Mississippi plants are under 30 for their uptake rates.
+
+### Boxplots of uptake depending on treatment
+
+Now, let's take a look at the importance of the treatment on those plants.
+Let's compare the uptake rate depending on the treatment.
+
 * For Quebec
-```{r}
-library(ggplot2)
-#ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill=Plant)) +
- # geom_boxplot() + ggtitle("uptake rates of Quebec plants depending on treatment")
 
-ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill = Treatment)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of Quebec plants depending on treatment")
+```{r}
+ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill = Treatment)) +
+  geom_boxplot(show.legend = FALSE) +
+  ggtitle("CO2 uptake rates of Quebec plants depending on treatment") +
+  ylab("CO2 uptake rate (umol/m² sec)")
 ```
 
-In the previous part, we study two plants from Quebec with different treatments and find out that there were important differences in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
+In the previous part, we studied two plants from Quebec with different treatments and find out that there was a significant difference in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
 
 * For Mississippi
-```{r}
-#ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill=Plant)) #+geom_boxplot()  +  ggtitle("uptake rates of Mississippi plants depending on #treatment")
 
-ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill= Treatment)) + geom_boxplot(show.legend = FALSE) + ggtitle("uptake rates of Mississippi plants depending on treatment")
+```{r}
+ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill= Treatment)) +
+  geom_boxplot(show.legend = FALSE) +
+  ggtitle("CO2 uptake rates of Mississippi plants depending on treatment") +
+  ylab("CO2 uptake rate (umol/m² sec)")
 ```
 
-Those differences are more relevant with Mississippi plants:
-Non chilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
+Those differences are even more relevant with Mississippi plants:
+nonchilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
 
 Now, if we combine our plots, we will obtain the following result:
-```{r}
-p<-ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) +
-  geom_boxplot() + ggtitle("uptake rates of plant types depending on treatment") 
-p + scale_color_brewer(palette="Set1")
 
+```{r}
+ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) + geom_boxplot() +
+  ggtitle("CO2 uptake rates of plants depending on origin and treatment") +
+  xlab("Origin") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
 
 Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
-
-```{r}
-#IDEEE RAJOUTER ???
-#If we split our boxplots depending the number of the plant, we will then obtain:
-#library(ggplot2)
-#p<-ggplot(CO2, aes(x=Plant, y=uptake, fill=Treatment, color=Type)) +
- # geom_boxplot() + ggtitle("uptake rates of plants depending on treatment") 
-#p + scale_color_brewer(palette="Set1")
-```
-
-
-### Qplot
-
-```{r}
-library(ggplot2)
-qplot(conc, uptake, facets = Treatment ~ ., data = CO2, color = Type,
-      geom = c("point", "smooth"), se = FALSE)
-qplot(uptake, data = CO2, color = Treatment, geom = "density")
-qplot(uptake, data = CO2, color = Type, geom = "density")
-```
 
 ## Testing hypothesis
 
@@ -200,9 +229,9 @@ Our alternative hypothesis is that treatment on plants may affect the uptake rat
 ```{r}
 t.test(CO2$uptake~CO2$Treatment)
 ```
+
 Looking on p-value for treatment, which is 3.107ee-3, we see that it is smaller that 0.05.
 So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
-
 
 ### Hypothesis on Type 
 
@@ -215,6 +244,7 @@ Our alternative hypothesis is that type of plants may affect the uptake rates.
 ```{r}
 t.test(CO2$uptake~CO2$Type)
 ```
+
 Looking on p-value for type, which is 4.451e-9, we see that it is smaller that 0.05.
 So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates.
 
@@ -223,27 +253,25 @@ So, we can reject our null hypothesis and conclude that the type may make a diff
 #### P value: Chi-test
 
 We combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
-By combining our hypothesis: 
+By combining our hypothesis:
+
 ```{r}
 tb <- table(CO2$Type, CO2$Treatment)
 chisq.test(tb)
 ```
 
-
 ## Fitting model
-
 
 ```{r}
 Treatment_fit = lm(CO2$uptake~CO2$Treatment)
 anova(Treatment_fit)
-
 
 Type_fit = lm(CO2$uptake~CO2$Type)
 anova(Type_fit)
 
 Treatm_Type_fit = lm(CO2$uptake ~ CO2$Type*CO2$Treatment)
 anova(Treatm_Type_fit)
-
 ```
+
 We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
 But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
