@@ -258,6 +258,7 @@ By combining our hypothesis:
 ```{r}
 tb <- table(CO2$Type, CO2$Treatment)
 chisq.test(tb)
+
 ```
 
 ## Fitting model
@@ -275,3 +276,6 @@ anova(Treatm_Type_fit)
 
 We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
 But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
+
+
+
