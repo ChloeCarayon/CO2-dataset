@@ -208,7 +208,7 @@ Now, if we combine our plots, we will obtain the following result:
 
 ```{r}
 ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) + geom_boxplot() +
-  ggtitle("CO2 uptake rates of plants depending on origin and treatment") +
+  ggtitle("CO2 uptake rates of plants depending on origin with treatment specified") +
   xlab("Origin") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
 
@@ -230,7 +230,7 @@ Our alternative hypothesis is that treatment on plants may affect the uptake rat
 t.test(CO2$uptake~CO2$Treatment)
 ```
 
-Looking on p-value for treatment, which is 3.107ee-3, we see that it is smaller that 0.05.
+Looking on p-value for treatment, which is 3.107ee-3, we see that it is smaller than the alpha value 0.05.
 So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
 
 ### Hypothesis on Type 
@@ -245,37 +245,30 @@ Our alternative hypothesis is that type of plants may affect the uptake rates.
 t.test(CO2$uptake~CO2$Type)
 ```
 
-Looking on p-value for type, which is 4.451e-9, we see that it is smaller that 0.05.
+Looking on p-value for type, which is 4.451e-9, we see that it is smaller than the alpha value 0.05.
 So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates.
 
 ### Combined our hypothesis
 
-#### P value: Chi-test
-
 We combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
 By combining our hypothesis:
 
+#### Correlation 
 ```{r}
-tb <- table(CO2$Type, CO2$Treatment)
-chisq.test(tb)
-
+cor.test(CO2$uptake,CO2$conc)
 ```
 
-## Fitting model
+
+#### Linear Model 
 
 ```{r}
-Treatment_fit = lm(CO2$uptake~CO2$Treatment)
-anova(Treatment_fit)
-
-Type_fit = lm(CO2$uptake~CO2$Type)
-anova(Type_fit)
-
 Treatm_Type_fit = lm(CO2$uptake ~ CO2$Type*CO2$Treatment)
 anova(Treatm_Type_fit)
+
 ```
 
 We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
 But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
 
 
-
+## Fitting model
