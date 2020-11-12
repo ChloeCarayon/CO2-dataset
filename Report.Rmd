@@ -223,7 +223,7 @@ Our alternative hypothesis is that treatment on plants may affect the uptake rat
 t.test(CO2$uptake~CO2$Treatment)
 ```
 
-Looking on p-value for treatment, which is 3.107ee-3, we see that it is smaller than the alpha value 0.05.
+Looking on p-value for treatment, which is 3.107e-3, we see that it is smaller than the alpha value 0.05.
 So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
 
 ### Hypothesis on Type 
@@ -232,7 +232,7 @@ Secondly, we make an assumption on the type of the plants.
 Our null hypothesis is that type will not affect the uptake rates
 Our alternative hypothesis is that type of plants may affect the uptake rates.
 
-#### P value, one way test 
+#### P value, one way test
 
 ```{r}
 t.test(CO2$uptake~CO2$Type)
@@ -246,18 +246,20 @@ So, we can reject our null hypothesis and conclude that the type may make a diff
 We combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
 By combining our hypothesis:
 
-#### Correlation 
+#### Correlation
+
 ```{r}
-cor.test(CO2$uptake,CO2$conc)
+cor.test(CO2$uptake, CO2$conc)
+cor.test(CO2$uptake, log(CO2$conc))
 ```
 
 
-#### Linear Model 
+#### Linear Model
 
 ```{r}
+# A réfléchir
 Treatm_Type_fit = lm(CO2$uptake ~ CO2$Type*CO2$Treatment)
 anova(Treatm_Type_fit)
-
 ```
 
 We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
@@ -265,3 +267,54 @@ But looking at the p-value for relationship between Treatment and Type, we obtai
 
 
 ## Fitting model
+
+```{r}
+model <- glm(Type ~ uptake + Treatment, family = binomial, data = CO2)
+summary(model)
+
+pred <- predict(model, newdata = CO2, type = "response")
+y_pred <- factor(ifelse(pred > 0.5, 1, 0), levels = c(0, 1))
+y <- CO2$Type
+levels(y) = c(0, 1)
+mean(y_pred == y)
+```
+
+```{r}
+predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Type)
+predicted_data <- predicted_data[order(predicted_data$probability),]
+predicted_data$rank <- 1:nrow(predicted_data)
+
+ggplot(data = predicted_data, aes(x=rank, y=probability)) +
+  geom_point(aes(color=predictor), alpha=1, shape=4, stroke=2) +
+  xlab("Index") +
+  ylab("Predicted probability")
+model$coefficients
+```
+
+```{r}
+model <- glm(Treatment ~ uptake + Type, family = binomial, data = CO2)
+summary(model)
+
+pred <- predict(model, newdata = CO2, type = "response")
+y_pred <- factor(ifelse(pred > 0.5, 1, 0), levels = c(0, 1))
+y <- CO2$Treatment
+levels(y) = c(0, 1)
+mean(y_pred == y)
+```
+
+```{r}
+predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Treatment)
+predicted_data <- predicted_data[order(predicted_data$probability),]
+predicted_data$rank <- 1:nrow(predicted_data)
+
+ggplot(data = predicted_data, aes(x=rank, y=probability)) +
+  geom_point(aes(color=predictor), alpha=1, shape=4, stroke=2) +
+  xlab("Index") +
+  ylab("Predicted probability")
+model$coefficients
+```
+
+```{r}
+model <- lm(uptake ~ log(conc) + Type + Treatment, data=CO2) # * ?
+summary(model)
+```
