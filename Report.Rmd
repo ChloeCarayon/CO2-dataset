@@ -181,28 +181,12 @@ This figure confirms what we saw in the data exploration part. There is a huge d
 Now, let's take a look at the importance of the treatment on those plants.
 Let's compare the uptake rate depending on the treatment.
 
-* For Quebec
-
 ```{r}
-ggplot(subset(CO2, Type == "Quebec"), aes(x=Treatment, y=uptake, fill = Treatment)) +
+ggplot(CO2, aes(x=Treatment, y=uptake,  fill=Treatment)) +
   geom_boxplot(show.legend = FALSE) +
-  ggtitle("CO2 uptake rates of Quebec plants depending on treatment") +
-  ylab("CO2 uptake rate (umol/m² sec)")
+  ggtitle("Plants CO2 uptake rates depending on treatment") +
+  xlab("Treatment") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
-
-In the previous part, we studied two plants from Quebec with different treatments and find out that there was a significant difference in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
-
-* For Mississippi
-
-```{r}
-ggplot(subset(CO2, Type == "Mississippi"), aes(x=Treatment, y=uptake, fill= Treatment)) +
-  geom_boxplot(show.legend = FALSE) +
-  ggtitle("CO2 uptake rates of Mississippi plants depending on treatment") +
-  ylab("CO2 uptake rate (umol/m² sec)")
-```
-
-Those differences are even more relevant with Mississippi plants:
-nonchilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
 
 Now, if we combine our plots, we will obtain the following result:
 
@@ -211,6 +195,15 @@ ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) + geom_boxplot() +
   ggtitle("CO2 uptake rates of plants depending on origin with treatment specified") +
   xlab("Origin") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
+
+* For Quebec
+
+In the previous part, we studied two plants from Quebec with different treatments and find out that there was a significant difference in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
+
+* For Mississippi
+
+Those differences are even more relevant with Mississippi plants:
+nonchilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
 
 Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
 
