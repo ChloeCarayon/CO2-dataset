@@ -239,11 +239,9 @@ Let's work on hypothesis regarding the treatment and the type.
 
 ### Hypothesis on treatment 
 
-Firstly, we make an assumption on the treatment of the plants. 
+Firstly, we make an assumption on the *treatment* of the plants. 
 Our null hypothesis is that treatment on plant will not affect the uptake rates.
 Our alternative hypothesis is that treatment on plants may affect the uptake rates.
-
-#### P value, one way test 
 
 ```{r}
 t.test(CO2$uptake~CO2$Treatment)
@@ -254,11 +252,9 @@ So, we can reject our null hypothesis and conclude that the treatment may make a
 
 ### Hypothesis on Type 
 
-Secondly, we make an assumption on the type of the plants. 
+Secondly, we make an assumption on the *type* of the plants. 
 Our null hypothesis is that type will not affect the uptake rates
 Our alternative hypothesis is that type of plants may affect the uptake rates.
-
-#### P value, one way test
 
 ```{r}
 t.test(CO2$uptake~CO2$Type)
@@ -269,28 +265,32 @@ So, we can reject our null hypothesis and conclude that the type may make a diff
 
 ### Combined our hypothesis
 
-We combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
-By combining our hypothesis:
+So we saw that independently, Type and Treatment may make a difference on the uptake rate.
 
-#### Correlation
-
-```{r}
-cor.test(CO2$uptake, CO2$conc)
-cor.test(CO2$uptake, log(CO2$conc))
-```
-
-
-#### Linear Model
+We can combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
+We combine our hypothesis and use an ANOVA test. 
+The difference with t.test is that ANOVA allows us to perform a t.test on 3 or more groups.
 
 ```{r}
-# A réfléchir
-Treatm_Type_fit = lm(CO2$uptake ~ CO2$Type*CO2$Treatment)
-anova(Treatm_Type_fit)
+anova(lm(CO2$uptake ~ CO2$Type*CO2$Treatment))
 ```
 
 We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
 But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
 
+#### Correlation
+In the plots above, we noticed that the relationship between concentration and uptake was not perfectly linear.
+So let's take a look on the correlation between them:
+
+```{r}
+cor.test(CO2$uptake, CO2$conc)
+```
+The correlation factor is under 50. We can improve it by using a log:
+
+```{r}
+cor.test(CO2$uptake, log(CO2$conc))
+```
+Using a log, we improve our linear correlation between those two values which could be useful for our fitting model.
 
 ## Fitting model
 
