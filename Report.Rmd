@@ -294,16 +294,36 @@ Using a log, we improve our linear correlation between those two values which co
 
 ## Fitting model
 
+In this part, we are going to fit several models (logistic and linear ones) in order to predict the origin, the treatment and the CO2 uptake rate according to several variables.
+
+### Model to predict the origin of the plant
+
+The first model aims to predict the origin of the plant.
+The predicted value is discrete and has two outcomes: Mississippi or Quebec.
+In this case, it seems reasonable to fit a logistic regression.
+We tried several combination of predictor variables and we obtained these accuracy values:
+
+* uptake only: 72.6 %
+* uptake + Treatment: 83.3 %
+* uptake + Treatment + conc: 85.7 %
+* uptake + Treatment + log(conc): 90.4 %
+
+We remark that the more predictors we use, the better the accuracy is.
+Moreover, using the log of the concentration improves the prediction because it has a better correlation than the concentration alone as we have seen in the previous part.
+
 ```{r}
-model <- glm(Type ~ uptake + Treatment, family = binomial, data = CO2)
+model <- glm(Type ~ uptake + Treatment + log(conc), family = binomial, data = CO2)
 summary(model)
 
-pred <- predict(model, newdata = CO2, type = "response")
-y_pred <- factor(ifelse(pred > 0.5, 1, 0), levels = c(0, 1))
-y <- CO2$Type
-levels(y) = c(0, 1)
-mean(y_pred == y)
+pred <- predict(model, type = "response")
+y_pred <- ifelse(pred > 0.5, "Mississippi", "Quebec")
+table(y_pred, CO2$Type, dnn = c("Predicted", "Observed"))
+mean(y_pred == CO2$Type)
 ```
+
+Here, we choose the combination offering the best accuracy.
+We can see that the model is wrong for only 8 observations out of 84.
+The following graph allows us to visualize the model and its errors:
 
 ```{r}
 predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Type)
@@ -317,16 +337,31 @@ ggplot(data = predicted_data, aes(x=rank, y=probability)) +
 model$coefficients
 ```
 
+### Model to predict the treatment of the plant
+
+For this model, we use the same reasoning as for the previous one, except that we want to predict the treatment in this case.
+The two outcomes are chilled or nonchilled.
+Below are the accuracy obtained for several combinations:
+
+* uptake only: 67.8 %
+* uptake + Type: 70.2 %
+* uptake + Type + conc: 76.1 %
+* uptake + Type + log(conc): 79.7 %
+
 ```{r}
-model <- glm(Treatment ~ uptake + Type, family = binomial, data = CO2)
+model <- glm(Treatment ~ uptake + Type + log(conc), family = binomial, data = CO2)
 summary(model)
 
-pred <- predict(model, newdata = CO2, type = "response")
-y_pred <- factor(ifelse(pred > 0.5, 1, 0), levels = c(0, 1))
-y <- CO2$Treatment
-levels(y) = c(0, 1)
-mean(y_pred == y)
+pred <- predict(model, type = "response")
+y_pred <- ifelse(pred > 0.5, "chilled", "nonchilled")
+table(y_pred, CO2$Treatment, dnn = c("Predicted", "Observed"))
+mean(y_pred == CO2$Treatment)
 ```
+
+We can see that the accuracy is worse than the one of the previous model (79.7 % and 90.4 %).
+Indeed, the treatment is more difficult to predict than the origin because the difference of the means is smaller (see data visualization part).
+The model is wrong for 17 observations out of 84.
+This graph helps to visualize the model and errors made:
 
 ```{r}
 predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Treatment)
@@ -340,7 +375,19 @@ ggplot(data = predicted_data, aes(x=rank, y=probability)) +
 model$coefficients
 ```
 
+### Model to predict the CO2 uptake rate of the plant
+
+Finally, we fit a linear regression model to predict the CO2 uptake.
+The outcome is thus a continuous value.
+As before, we can try several combinations of predictors and compare the R² value this time:
+
+* log(conc) only: 0.351
+* log(conc) + Type: 0.697
+* log(conc) + Type + Treatment: 0.799
+
 ```{r}
-model <- lm(uptake ~ log(conc) + Type + Treatment, data=CO2) # * ?
+model <- lm(uptake ~ log(conc) + Type + Treatment, data=CO2)
 summary(model)
 ```
+
+We see that our fitted model is correct but not very good with a R² value of about 0.8. To get this value closer to 1, we would need more observations or other predictor variables to better predict the uptake.
