@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ## Description of the dataset
 
 The CO2 data frame is the result of an experiment based on the cold tolerance of the grass species Echinochloa crus-galli.
-We load the data and get some information about it thanks to this commands:
+We load the data and obtain some information thanks to those commands:
 
 ```{r description}
 data(CO2)
@@ -72,7 +72,7 @@ By grouping plants by their type (Quebec - Mississipi), we can see some characte
 tapply(CO2$uptake, CO2$Type, summary)
 ```
 
-Plants from Quebec have an uptake rate between 9.30 and 45.50 whereas for Mississippi, it is between 7.70 and 35.50.
+Plants from Quebec have an uptake rate between 9.30 and 45.50  umol/m² sec whereas for Mississippi, it is between 7.70 and 35.50  umol/m² sec.
 Moreover, for Quebec, half of plants have an uptake rate greater than 37.15 while for Mississippi, it is 19.30.
 There are huge differences between Quebec and Mississippi minimums, maximums, medians and also quartiles.
 A quarter of Quebec plants have an uptake rate under 30.32 while for Mississipi it is 13.88.
@@ -80,9 +80,22 @@ Finally, for 75% of Mississippi plants, the uptake rate is less than 28.05 where
 
 So it appears that Quebec plants seem to have higher uptake rates than Mississippi plants.
 
-Let's take a look on two plants from Quebec, one chilled and one non chilled:
+By grouping plants by their treatment (chilled - nonchilled), we can see some characteristics: 
 
 ```{r tapply2}
+tapply(CO2$uptake, CO2$Treatment, summary)
+```
+Plants non chilled have an uptake rate between 10.60 and 45.50  umol/m² sec whereas for chilled, it is between 7.70 and 42.40 umol/m² sec.
+Moreover, for non chilled, half of plants have an uptake rate greater than 31.30 while for chilled, it is 19.70.
+A quarter of non chilled plants have an uptake rate under 26.48 while for chilled it is 14.53.
+Finally, for 75% of chilled plants, the uptake rate is less than 34.90 whereas for non chilled it is less than 45.50.
+
+So it appears that non chilled plants seem to have higher uptake rates than chilled plants.
+
+
+Now let's combine our two characteristics, type and treatment and take a look on two plants from Quebec, one chilled and one non chilled:
+
+```{r tapply3}
 tapply(CO2$uptake, CO2$Plant, summary)
 ```
 
@@ -162,7 +175,12 @@ Again, these two plots confirm our hypothesis made above.
 An important part of Mississippi plants have an uptake rate between 15 and 20 umol/m² sec whereas for Quebec plants the peak is at about 40 umol/m² sec.
 For the treatment, a big part of chilled plants have an uptake rate between 15 and 20 umol/m² sec whereas for nonchilled plants the peak is higher, at about 30 umol/m² sec.
 
-### Boxplot of uptake by origin
+
+
+
+### Specific overview 
+
+#### Boxplot of uptake by origin
 
 Now, we are going to use boxplots to visualize the spreading of the uptake rates.
 We can group our plants by types (Quebec and Mississippi):
@@ -174,9 +192,12 @@ ggplot(CO2, aes(x=Type, y=uptake,  fill=Type)) +
   xlab("Origin") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
 
-This figure confirms what we saw in the data exploration part. There is a huge difference in the uptake rates between plants from Quebec and plants from Mississippi. As we know 50% of the data is in the box and by visualizing those boxplots, we clearly see that on average, plants from Quebec have higher uptake rates than Mississippi plants. In fact 25% of Quebec plants have less than 30 for their uptake rate whereas more than 75% of Mississippi plants are under 30 for their uptake rates.
+This figure confirms what we saw in the data exploration part. There is a huge difference in the uptake rates between plants from Quebec and plants from Mississippi. 
+As we know 50% of the data is in the box and by visualizing those boxplots, we clearly see that on average, plants from Quebec have higher uptake rates than Mississippi plants. 
+Half of Quebec plants are over 37 umol/m² sec for the uptake rates while for Mississippi it is around 19 umol/m² sec.
+In fact 25% of Quebec plants have less than 30 umol/m² sec for their uptake rate whereas more than 75% of Mississippi plants are under 29 umol/m² sec for their uptake rates.
 
-### Boxplots of uptake depending on treatment
+#### Boxplots of uptake depending on treatment
 
 Now, let's take a look at the importance of the treatment on those plants.
 Let's compare the uptake rate depending on the treatment.
@@ -187,6 +208,11 @@ ggplot(CO2, aes(x=Treatment, y=uptake,  fill=Treatment)) +
   ggtitle("Plants CO2 uptake rates depending on treatment") +
   xlab("Treatment") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
+As we saw thanks to the apply function, non chilled plants seem to have higher uptake rates than chilled plants.
+The difference between non chilled and chilled plants is less than between Quebec and Mississippi but is still important.
+We clearly see that half non chilled plants are over 30 umol/m² sec for the uptake rates while for chilled it is around 19 umol/m² sec.
+25% of non chilled plants have an uptake rates less than 26 umol/m² sec whereas 50% of chilled plants have less than 19 for their uptake rates.
+
 
 Now, if we combine our plots, we will obtain the following result:
 
@@ -198,12 +224,12 @@ ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) + geom_boxplot() +
 
 * For Quebec
 
-In the previous part, we studied two plants from Quebec with different treatments and find out that there was a significant difference in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 while half of nonchilled have an uptake rate of more than 39.
+In the previous part, we studied two plants from Quebec with different treatments and find out that there was a significant difference in their uptake rates. It appears clearly here as less than 75% of chilled plants are under 39 umol/m² sec while half of non chilled have an uptake rate of more than 39 umol/m² sec.
 
 * For Mississippi
 
 Those differences are even more relevant with Mississippi plants:
-nonchilled Mississippi plants have box where more than 25% are upper 22 whereas for chilled plants, less than 75% of them can reach 19.
+non chilled Mississippi plants have box where more than 25% are upper 22 umol/m² sec whereas for chilled plants, less than 75% of them can reach 19.
 
 Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
 
