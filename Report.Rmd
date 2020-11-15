@@ -20,6 +20,8 @@ We load the data and obtain some information thanks to those commands:
 data(CO2)
 dim(CO2)
 names(CO2)
+
+CO2[sample(nrow(CO2)),]
 ```
 
 The CO2 dataset is composed of 84 rows ans 5 columns of names
@@ -65,6 +67,8 @@ levels(CO2$Plant)
 
 Thanks to the summary, we obtain information about each column. We execute the levels function on CO2$Plant as we don't have all the information displayed in the summary. 
 We see that 3 plants were put in several conditions (with their name corresponding to the type, treatment and number) and measurements were made on their carbon dioxide uptake rates according to the concentration of ambient carbon dioxide.
+
+### Characteristics
 
 By grouping plants by their type (Quebec - Mississipi), we can see some characteristics:
 
@@ -173,16 +177,13 @@ qplot(uptake, data = CO2, color = Treatment, geom = "density",
 
 Again, these two plots confirm our hypothesis made above.
 An important part of Mississippi plants have an uptake rate between 15 and 20 umol/m² sec whereas for Quebec plants the peak is at about 40 umol/m² sec.
-For the treatment, a big part of chilled plants have an uptake rate between 15 and 20 umol/m² sec whereas for nonchilled plants the peak is higher, at about 30 umol/m² sec.
-
-
-
+For the treatment, a big part of chilled plants have an uptake rate between 15 and 20 umol/m² sec whereas for non chilled plants the peak is higher, at about 30 umol/m² sec.
 
 ### Specific overview 
 
 #### Boxplot of uptake by origin
 
-Now, we are going to use boxplots to visualize the spreading of the uptake rates.
+Now, we are going to use box plots to visualize the spreading of the uptake rates.
 We can group our plants by types (Quebec and Mississippi):
 
 ```{r}
@@ -193,7 +194,7 @@ ggplot(CO2, aes(x=Type, y=uptake,  fill=Type)) +
 ```
 
 This figure confirms what we saw in the data exploration part. There is a huge difference in the uptake rates between plants from Quebec and plants from Mississippi. 
-As we know 50% of the data is in the box and by visualizing those boxplots, we clearly see that on average, plants from Quebec have higher uptake rates than Mississippi plants. 
+As we know 50% of the data is in the box and by visualizing those box plots, we clearly see that on average, plants from Quebec have higher uptake rates than Mississippi plants. 
 Half of Quebec plants are over 37 umol/m² sec for the uptake rates while for Mississippi it is around 19 umol/m² sec.
 In fact 25% of Quebec plants have less than 30 umol/m² sec for their uptake rate whereas more than 75% of Mississippi plants are under 29 umol/m² sec for their uptake rates.
 
@@ -208,13 +209,15 @@ ggplot(CO2, aes(x=Treatment, y=uptake,  fill=Treatment)) +
   ggtitle("Plants CO2 uptake rates depending on treatment") +
   xlab("Treatment") + ylab("CO2 uptake rate (umol/m² sec)")
 ```
+
 As we saw thanks to the apply function, non chilled plants seem to have higher uptake rates than chilled plants.
 The difference between non chilled and chilled plants is less than between Quebec and Mississippi but is still important.
 We clearly see that half non chilled plants are over 30 umol/m² sec for the uptake rates while for chilled it is around 19 umol/m² sec.
 25% of non chilled plants have an uptake rates less than 26 umol/m² sec whereas 50% of chilled plants have less than 19 for their uptake rates.
 
+#### Boxplots of uptake depending on treatment and type
 
-Now, if we combine our plots, we will obtain the following result:
+If we combine our plots, we will obtain the following result:
 
 ```{r}
 ggplot(CO2, aes(x=Type, y=uptake, fill=Treatment)) + geom_boxplot() +
@@ -233,50 +236,61 @@ non chilled Mississippi plants have box where more than 25% are upper 22 umol/m�
 
 Thanks to those boxplots, we can clearly see that depending on the type of plants and the treatment, there are some chance to obtain very different uptake rates.
 
+
 ## Testing hypothesis
 
 Let's work on hypothesis regarding the treatment and the type.
 
 ### Hypothesis on treatment 
 
-Firstly, we make an assumption on the *treatment* of the plants. 
+Firstly, we make an assumption on the **treatment** of the plants. 
 Our null hypothesis is that treatment on plant will not affect the uptake rates.
 Our alternative hypothesis is that treatment on plants may affect the uptake rates.
+We take a 99% confidence interval:
 
 ```{r}
-t.test(CO2$uptake~CO2$Treatment)
+t.test(CO2$uptake~CO2$Treatment, conf.level = 0.99)
 ```
 
-Looking on p-value for treatment, which is 3.107e-3, we see that it is smaller than the alpha value 0.05.
+Looking on p-value for treatment, which is 3.107e-3, we see that it is smaller than 0.01.
 So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
 
 ### Hypothesis on Type 
 
-Secondly, we make an assumption on the *type* of the plants. 
+Secondly, we make an assumption on the **type** of the plants. 
 Our null hypothesis is that type will not affect the uptake rates
 Our alternative hypothesis is that type of plants may affect the uptake rates.
+We take a 99% confidence interval:
 
 ```{r}
-t.test(CO2$uptake~CO2$Type)
+t.test(CO2$uptake~CO2$Type, conf.level = 0.99)
 ```
 
-Looking on p-value for type, which is 4.451e-9, we see that it is smaller than the alpha value 0.05.
+Looking on p-value for type, which is 4.451e-9, we see that it is smaller than 0.01.
 So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates.
+
 
 ### Combined our hypothesis
 
-So we saw that independently, Type and Treatment may make a difference on the uptake rate.
+So we saw that independently, type and treatment may make a difference on the uptake rate.
 
-We can combine our two hypothesis and make an assumption that the relationship between Type and Treatment will not make a difference on the uptake rates.
+We can combine our two hypothesis and make an assumption that the relationship between type and treatment will not make a difference on the uptake rates.
 We combine our hypothesis and use an ANOVA test. 
-The difference with t.test is that ANOVA allows us to perform a t.test on 3 or more groups.
+T test method determines whether two groups are statistically different whereas ANOVA allows us to determines on three or more groups, that is why we have to use it.
 
 ```{r}
 anova(lm(CO2$uptake ~ CO2$Type*CO2$Treatment))
 ```
 
-We obtain 2.378e-10 for Type and 1.817e-4 for Treatment for p-value. Those values are smaller than 0.05, so we can again reject the null hypothesis and conclude that Type and Treatment may make a difference on the uptake rates.
-But looking at the p-value for relationship between Treatment and Type, we obtain 0.0642 which is bigger than 0.05. So, we can't reject the null hypothesis and we conclude that the relationship between Type and Treatment did not seriously impact the uptake rates.
+Both t test and ANOVA look at the difference in means and the spread of the distributions. But ANOVA and t test don't determine the statistical significance in the same way. 
+That is why, our p-value for respectively treatment and Type are quit different from the ones we obtain using t test.
+
+With a confidence interval at 99%:
+We obtain 2.378e-10 for type and 1.817e-4 for treatment for p-value. Those values are smaller than 0.01, so we can again reject the null hypothesis and conclude that type and treatment may make a difference on the uptake rates.
+
+But looking at the p-value for relationship between treatment and type, we obtain 0.0642 which is bigger than 0.01. So, with an interval at 99%, we can't reject the null hypothesis and we conclude that the relationship between type and treatment did not seriously impact the uptake rates.
+
+If we take an interval at 90%, we could reject the null hypothesis but it will deteriorate the accuracy.
 
 #### Correlation
 In the plots above, we noticed that the relationship between concentration and uptake was not perfectly linear.
@@ -285,12 +299,14 @@ So let's take a look on the correlation between them:
 ```{r}
 cor.test(CO2$uptake, CO2$conc)
 ```
+
 The correlation factor is under 50. We can improve it by using a log:
 
 ```{r}
 cor.test(CO2$uptake, log(CO2$conc))
 ```
-Using a log, we improve our linear correlation between those two values which could be useful for our fitting model.
+
+Using a log, we lower the impact of the concentration compare to the uptake and improve our linear correlation between those two values. It will be useful for our linear regression model.
 
 ## Fitting model
 
