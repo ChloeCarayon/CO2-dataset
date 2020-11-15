@@ -423,3 +423,16 @@ testData
 ```
 
 The actual uptake values and the predicted ones are quite similar even if the prediction is far from being perfect. Our model and the dataset are not optimal so we are satisfied with these results.
+
+
+# Conclusion
+
+In our analysis, we saw that type and treatment can both influence the CO2 uptake rates of plants. 
+This first approach on CO2 data set gives us the ability to predict treatment and type depending on uptake rates and inversely uptake rates depending on treatment and type.
+
+The most precise **logistic model**  on type confirms what we saw in the data visualization part where box plot from Quebec and Mississippi had huge difference in their quartiles and median.This model can easily predict the type of plants based on the CO2 uptake rates.
+The second one is the **linear regression model** which predicts uptake rates based on type and treatment given. The results are not as precise as we want them to be.
+
+In order to improve our models, we would need more observations or predictor variables. 
+
+
