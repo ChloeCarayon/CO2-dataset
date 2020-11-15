@@ -296,11 +296,11 @@ Using a log, we improve our linear correlation between those two values which co
 
 In this part, we are going to fit several models (logistic and linear ones) in order to predict the origin, the treatment and the CO2 uptake rate according to several variables.
 
-### Model to predict the origin of the plant
+### Model to predict the origin of a plant
 
 The first model aims to predict the origin of the plant.
 The predicted value is discrete and has two outcomes: Mississippi or Quebec.
-In this case, it seems reasonable to fit a logistic regression.
+In this case, it seems reasonable to fit a **logistic regression**.
 We tried several combination of predictor variables and we obtained these accuracy values:
 
 * uptake only: 72.6 %
@@ -312,32 +312,32 @@ We remark that the more predictors we use, the better the accuracy is.
 Moreover, using the log of the concentration improves the prediction because it has a better correlation than the concentration alone as we have seen in the previous part.
 
 ```{r}
-model <- glm(Type ~ uptake + Treatment + log(conc), family = binomial, data = CO2)
-summary(model)
+type_model <- glm(Type ~ uptake + Treatment + log(conc), family = binomial, data = CO2)
+summary(type_model)
 
-pred <- predict(model, type = "response")
-y_pred <- ifelse(pred > 0.5, "Mississippi", "Quebec")
-table(y_pred, CO2$Type, dnn = c("Predicted", "Observed"))
-mean(y_pred == CO2$Type)
+type_probs <- predict(type_model, type = "response")
+type_pred <- ifelse(type_probs > 0.5, "Mississippi", "Quebec")
+table(Predicted=type_pred, Observed=CO2$Type)
+mean(type_pred == CO2$Type)
 ```
 
-Here, we choose the combination offering the best accuracy.
+Here, we chose the combination offering the best accuracy.
 We can see that the model is wrong for only 8 observations out of 84.
 The following graph allows us to visualize the model and its errors:
 
 ```{r}
-predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Type)
-predicted_data <- predicted_data[order(predicted_data$probability),]
-predicted_data$rank <- 1:nrow(predicted_data)
+type_pred_data <- data.frame(prob=type_model$fitted.values, Type=CO2$Type)
+type_pred_data <- type_pred_data[order(type_pred_data$prob), ]
+type_pred_data$rank <- 1:nrow(type_pred_data)
 
-ggplot(data = predicted_data, aes(x=rank, y=probability)) +
-  geom_point(aes(color=predictor), alpha=1, shape=4, stroke=2) +
+ggplot(data = type_pred_data, aes(x=rank, y=prob)) +
+  geom_point(aes(color=Type), shape=4, stroke=2) +
+  ggtitle("Probability that a plant is from Mississippi rather than Quebec") +
   xlab("Index") +
   ylab("Predicted probability")
-model$coefficients
 ```
 
-### Model to predict the treatment of the plant
+### Model to predict the treatment of a plant
 
 For this model, we use the same reasoning as for the previous one, except that we want to predict the treatment in this case.
 The two outcomes are chilled or nonchilled.
@@ -349,13 +349,13 @@ Below are the accuracy obtained for several combinations:
 * uptake + Type + log(conc): 79.7 %
 
 ```{r}
-model <- glm(Treatment ~ uptake + Type + log(conc), family = binomial, data = CO2)
-summary(model)
+treat_model <- glm(Treatment ~ uptake + Type + log(conc), family = binomial, data = CO2)
+summary(treat_model)
 
-pred <- predict(model, type = "response")
-y_pred <- ifelse(pred > 0.5, "chilled", "nonchilled")
-table(y_pred, CO2$Treatment, dnn = c("Predicted", "Observed"))
-mean(y_pred == CO2$Treatment)
+treat_probs <- predict(treat_model, type = "response")
+treat_pred <- ifelse(treat_probs > 0.5, "chilled", "nonchilled")
+table(Predicted=treat_pred, Observed=CO2$Treatment)
+mean(treat_pred == CO2$Treatment)
 ```
 
 We can see that the accuracy is worse than the one of the previous model (79.7 % and 90.4 %).
@@ -364,20 +364,20 @@ The model is wrong for 17 observations out of 84.
 This graph helps to visualize the model and errors made:
 
 ```{r}
-predicted_data <- data.frame(probability=model$fitted.values, predictor=CO2$Treatment)
-predicted_data <- predicted_data[order(predicted_data$probability),]
-predicted_data$rank <- 1:nrow(predicted_data)
+treat_pred_data <- data.frame(prob=treat_model$fitted.values, Treatment=CO2$Treatment)
+treat_pred_data <- treat_pred_data[order(treat_pred_data$prob), ]
+treat_pred_data$rank <- 1:nrow(treat_pred_data)
 
-ggplot(data = predicted_data, aes(x=rank, y=probability)) +
-  geom_point(aes(color=predictor), alpha=1, shape=4, stroke=2) +
+ggplot(data = treat_pred_data, aes(x=rank, y=prob)) +
+  geom_point(aes(color=Treatment), shape=4, stroke=2) +
+  ggtitle("Probability that a plant was chilled rather than non-chilled") +
   xlab("Index") +
   ylab("Predicted probability")
-model$coefficients
 ```
 
-### Model to predict the CO2 uptake rate of the plant
+### Model to predict the CO2 uptake rate of a plant
 
-Finally, we fit a linear regression model to predict the CO2 uptake.
+Finally, we fit a **linear regression** model to predict the CO2 uptake.
 The outcome is thus a continuous value.
 As before, we can try several combinations of predictors and compare the R² value this time:
 
@@ -386,8 +386,24 @@ As before, we can try several combinations of predictors and compare the R² val
 * log(conc) + Type + Treatment: 0.799
 
 ```{r}
-model <- lm(uptake ~ log(conc) + Type + Treatment, data=CO2)
-summary(model)
+uptake_model <- lm(uptake ~ log(conc) + Type + Treatment, data=CO2)
+summary(uptake_model)
 ```
 
 We see that our fitted model is correct but not very good with a R² value of about 0.8. To get this value closer to 1, we would need more observations or other predictor variables to better predict the uptake.
+
+To illustrate this model, we can input some test values and compare with the predictions:
+
+```{r}
+v1 = c(95, 250, 250, 250, 500, 1000)
+v2 = c("Quebec", "Quebec", "Mississippi", "Mississippi", "Mississippi", "Quebec")
+v3 = c("chilled", "nonchilled", "chilled", "nonchilled", "chilled", "nonchilled")
+v4 = c(12.8, 37.4, 16.1, 27.5, 16.6, 43.1)
+# v4 values obtained with summarize(group_by(CO2, Type, Treatment, conc), mean(uptake))
+
+testData <- data.frame(conc=v1, Type=v2, Treatment=v3, uptake=v4)
+testData["predicted_uptake"] <- predict(uptake_model, testData)
+testData
+```
+
+The actual uptake values and the predicted ones are quite similar even if the prediction is far from being perfect. Our model and the dataset are not optimal so we are satisfied with these results.
