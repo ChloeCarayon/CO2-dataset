@@ -252,23 +252,9 @@ Thanks to those box plots, we can clearly see that depending on the type of plan
 
 Let's work on hypothesis regarding the treatment and the type.
 
-### Hypothesis on treatment 
-
-Firstly, we make an assumption on the **treatment** of the plants. 
-Our null hypothesis is that treatment on plant will not affect the uptake rates.
-Our alternative hypothesis is that treatment on plants may affect the uptake rates.
-We take a 99% confidence interval:
-
-```{r}
-t.test(CO2$uptake~CO2$Treatment, conf.level = 0.99)
-```
-
-Looking on p-value for treatment, which is 3.107e-3, we see that it is smaller than 0.01.
-So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
-
 ### Hypothesis on Type 
 
-Secondly, we make an assumption on the **type** of the plants. 
+Firstly, we make an assumption on the **type** of the plants. 
 Our null hypothesis is that type will not affect the uptake rates
 Our alternative hypothesis is that type of plants may affect the uptake rates.
 We take a 99% confidence interval:
@@ -278,8 +264,27 @@ t.test(CO2$uptake~CO2$Type, conf.level = 0.99)
 ```
 
 Looking on p-value for type, which is 4.451e-9, we see that it is smaller than 0.01.
-So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates.
+So, we can reject our null hypothesis and conclude that the type may make a difference on the uptake rates. 
 
+This very low p-value confirms what we saw in the box plot on type. We can easily draw the line between the two types of plants. 
+
+### Hypothesis on treatment 
+
+Secondly, we make an assumption on the **treatment** of the plants. 
+Our null hypothesis is that treatment on plant will not affect the uptake rates.
+Our alternative hypothesis is that treatment on plants may affect the uptake rates.
+We take a 99% confidence interval:
+
+```{r}
+t.test(CO2$uptake~CO2$Treatment, conf.level = 0.99)
+```
+
+Looking on p-value for treatment, which is 3.107e-3, we see that it is smaller than 0.01.
+
+So, we can reject our null hypothesis and conclude that the treatment may make a difference on the uptake rates.
+
+The p-value for treatment is bigger than the one from type. 
+So we can suppose that we could encounter more mistakes doing prediction on treatment than on type. 
 
 ### Combined our hypothesis
 
@@ -293,8 +298,8 @@ T test method determines whether two groups are statistically different whereas 
 anova(lm(CO2$uptake ~ CO2$Type*CO2$Treatment))
 ```
 
-Both t test and ANOVA look at the difference in means and the spread of the distributions. But ANOVA and t test don't determine the statistical significance in the same way. 
-That is why, our p-value for respectively treatment and Type are quit different from the ones we obtain using t test.
+Both t test and ANOVA look at the difference in means and the spread of the distributions. But they don't determine the statistical significance in the same way. 
+That is why, our p-value for respectively treatment and type are quit different from the ones we obtain using t test.
 
 With a confidence interval at 99%:
 We obtain 2.378e-10 for type and 1.817e-4 for treatment for p-value. Those values are smaller than 0.01, so we can again reject the null hypothesis and conclude that type and treatment may make a difference on the uptake rates.
@@ -302,9 +307,10 @@ We obtain 2.378e-10 for type and 1.817e-4 for treatment for p-value. Those value
 But looking at the p-value for relationship between treatment and type, we obtain 0.0642 which is bigger than 0.01. So, with an interval at 99%, we can't reject the null hypothesis and we conclude that the relationship between type and treatment did not seriously impact the uptake rates.
 
 If we take an interval at 90%, we could reject the null hypothesis but it will deteriorate the accuracy.
+We may encounter some errors in our prediction for example for Mississippi chilled and non chilled plants as their uptake rates are very similar .
 
 #### Correlation
-In the plots above, we noticed that the relationship between concentration and uptake was not perfectly linear.
+In the general plots above, we noticed that the relationship between concentration and uptake was not perfectly linear.
 So let's take a look on the correlation between them:
 
 ```{r}
